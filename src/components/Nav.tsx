@@ -16,6 +16,7 @@ export default function Nav() {
     { href: "/story", label: t("story") },
     { href: "/rights", label: t("rights") },
     { href: "/complaints", label: t("complaints") },
+    { href: "/news", label: t("news") },
     { href: "/about", label: t("about") },
   ] as const;
 

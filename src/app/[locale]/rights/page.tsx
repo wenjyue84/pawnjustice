@@ -7,6 +7,10 @@ import {
   Scale,
   Building2,
   CheckCircle2,
+  ChevronRight,
+  Download,
+  AlertCircle,
+  Lightbulb,
 } from "lucide-react";
 
 export default async function RightsPage({
@@ -16,11 +20,29 @@ export default async function RightsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <RightsContent />;
+  return <RightsContent locale={locale} />;
 }
 
-function RightsContent() {
+function StepCard({
+  number,
+  text,
+}: {
+  number: number;
+  text: string;
+}) {
+  return (
+    <div className="flex gap-3 items-start">
+      <span className="bg-navy text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shrink-0 mt-0.5">
+        {number}
+      </span>
+      <p className="text-gray-700 text-sm leading-relaxed">{text}</p>
+    </div>
+  );
+}
+
+function RightsContent({ locale }: { locale: string }) {
   const t = useTranslations("rights");
+  const g = useTranslations("guide");
 
   const rights = ["r1", "r2", "r3", "r4", "r5", "r6", "r7"] as const;
   const penalties = [
@@ -30,12 +52,48 @@ function RightsContent() {
     { offence: "p4Offence", law: "p4Law", penalty: "p4Penalty" },
   ] as const;
 
-  const channels = [
-    { titleKey: "channel1Title", descKey: "channel1Desc", icon: FileText },
-    { titleKey: "channel2Title", descKey: "channel2Desc", icon: Building2 },
-    { titleKey: "channel3Title", descKey: "channel3Desc", icon: Scale },
-    { titleKey: "channel4Title", descKey: "channel4Desc", icon: Phone },
-  ] as const;
+  const guideSteps = [
+    {
+      titleKey: "policeTitle" as const,
+      introKey: "policeIntro" as const,
+      steps: ["policeStep1", "policeStep2", "policeStep3", "policeStep4", "policeStep5", "policeStep6", "policeStep7"] as const,
+      tipKey: "policeTip" as const,
+      icon: FileText,
+      color: "border-blue-500",
+    },
+    {
+      titleKey: "kpktTitle" as const,
+      introKey: "kpktIntro" as const,
+      steps: ["kpktStep1", "kpktStep2", "kpktStep3", "kpktStep4", "kpktStep5", "kpktStep6", "kpktStep7"] as const,
+      tipKey: null,
+      icon: Building2,
+      color: "border-green-600",
+    },
+    {
+      titleKey: "demandTitle" as const,
+      introKey: "demandIntro" as const,
+      steps: ["demandStep1", "demandStep2", "demandStep3", "demandStep4"] as const,
+      tipKey: "demandTip" as const,
+      icon: Scale,
+      color: "border-gold",
+    },
+    {
+      titleKey: "tribunalTitle" as const,
+      introKey: "tribunalIntro" as const,
+      steps: ["tribunalStep1", "tribunalStep2", "tribunalStep3", "tribunalStep4", "tribunalStep5", "tribunalStep6"] as const,
+      tipKey: null,
+      icon: Shield,
+      color: "border-red-accent",
+    },
+    {
+      titleKey: "ncccTitle" as const,
+      introKey: "ncccIntro" as const,
+      steps: ["ncccStep1", "ncccStep2", "ncccStep3"] as const,
+      tipKey: null,
+      icon: Phone,
+      color: "border-purple-500",
+    },
+  ];
 
   return (
     <div>
@@ -114,28 +172,83 @@ function RightsContent() {
         </div>
       </section>
 
-      {/* How to Complain */}
-      <section className="py-16 bg-gray-warm">
+      {/* Step-by-Step Guide */}
+      <section className="py-16 bg-navy-dark text-white" id="guide">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8">{t("complainTitle")}</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {channels.map((ch) => {
-              const Icon = ch.icon;
+          <h2 className="text-2xl md:text-3xl font-bold text-white text-center mb-3">
+            {g("title")}
+          </h2>
+          <p className="text-white/70 text-center mb-12">{g("subtitle")}</p>
+
+          <div className="space-y-8">
+            {guideSteps.map((step) => {
+              const Icon = step.icon;
               return (
                 <div
-                  key={ch.titleKey}
-                  className="bg-white p-6 rounded-xl shadow-lg"
+                  key={step.titleKey}
+                  className={`bg-white text-foreground rounded-xl p-6 border-l-4 ${step.color}`}
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <Icon className="w-8 h-8 text-navy" />
-                    <h3 className="font-bold text-lg">{t(ch.titleKey)}</h3>
+                    <Icon className="w-7 h-7 text-navy" />
+                    <h3 className="font-bold text-xl text-navy">
+                      {g(step.titleKey)}
+                    </h3>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {t(ch.descKey)}
-                  </p>
+                  <p className="text-gray-600 mb-5 italic">{g(step.introKey)}</p>
+
+                  <div className="space-y-3">
+                    {step.steps.map((stepKey, i) => (
+                      <StepCard key={stepKey} number={i + 1} text={g(stepKey)} />
+                    ))}
+                  </div>
+
+                  {step.tipKey && (
+                    <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex gap-2">
+                      <Lightbulb className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+                      <p className="text-sm text-gray-700">{g(step.tipKey)}</p>
+                    </div>
+                  )}
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Download Template */}
+      <section className="py-16 bg-gray-warm">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <Download className="w-12 h-12 text-navy mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-3">{g("downloadTitle")}</h2>
+          <p className="text-gray-600 mb-8">{g("downloadDesc")}</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href={`/api/template?lang=en`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-navy hover:bg-navy-light text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {g("downloadBtn")}
+            </a>
+            <a
+              href={`/api/template?lang=ms`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-navy-light hover:bg-navy text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {g("downloadBtnMs")}
+            </a>
+            <a
+              href={`/api/template?lang=zh`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-navy-light hover:bg-navy text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center justify-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              {g("downloadBtnZh")}
+            </a>
           </div>
         </div>
       </section>
